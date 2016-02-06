@@ -1,0 +1,25 @@
+{
+    "name": "chalasr/doctrine-test-util",
+    "description": "Doctrine testing tools",
+    "keywords": ["phpunit", "doctrine", "entitymanager", "em", "entity", "flush", "mock", "database", "connection", "test", "orm"],
+    "homepage": "https://github.com/chalasr/Importer",
+    "type": "library",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Robin Chalas",
+            "email": "robin.chalas@gmail.com",
+            "homepage": "https://github.com/chalasr"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.9",
+        "ext-pdo": "*",
+        "doctrine/orm": "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "RCH\\DoctrineTestUtil": "lib/"
+        }
+    }
+}
