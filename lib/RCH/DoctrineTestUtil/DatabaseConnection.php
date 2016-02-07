@@ -25,12 +25,14 @@ class DatabaseConnection
     /**
      * Get database connection.
      *
+     * @static
+     *
      * @return DatabaseConnection
      */
     public static function create()
     {
         $entityManager = self::getEntityManager();
-        // $pdo = $entityManager->getConnection()->getWrappedConnection();
+        $pdo = $entityManager->getConnection()->getWrappedConnection();
         $entityManager->clear();
 
         $tool = new SchemaTool($entityManager);
@@ -39,13 +41,13 @@ class DatabaseConnection
         $tool->dropSchema($classes);
         $tool->createSchema($classes);
 
-        /* createDefaultDBConnection($pdo, $GLOBALS['db_user']); // Pass it to phpunit */
-
         return new self();
     }
 
     /**
      * Get entity manager.
+     *
+     * @static
      *
      * @return EntityManager
      */
@@ -59,5 +61,43 @@ class DatabaseConnection
         $metadataConfiguration = Setup::createAnnotationMetadataConfiguration(array(__DIR__.'/Entity'), true, null, null, false);
 
         return EntityManager::create($mysqlConnection, $metadataConfiguration);
+    }
+
+    /**
+     * Get PHPUnit database connection.
+     *
+     * @static
+     *
+     * @param EntityManager|null $entityManager
+     *
+     * @return \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection
+     */
+    public static function getDatabaseConnectionForTest(EntityManager $entityManager = null)
+    {
+        if (!$entityManager instanceof EntityManager) {
+            $entityManager = self::getEntityManager();
+        }
+
+        $pdo = $entityManager->getConnection()->getWrappedConnection();
+
+        return new \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection($pdo, $GLOBALS['db_name']);
+    }
+
+    /**
+     * Get PHPUnit database test case.
+     *
+     * @static
+     *
+     * @param \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection|null $connection
+     *
+     * @return \PHPUnit_Extensions_Database_DefaultTester
+     */
+    public static function getDatabaseTestCase(\PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection $connection = null)
+    {
+        if (!$connection) {
+            $connection = self::getDatabaseConnectionForTest();
+        }
+
+        return new \PHPUnit_Extensions_Database_DefaultTester($connection);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 $finder = Symfony\CS\Finder\DefaultFinder::create()
-    ->in(array(__DIR__))
+    ->in(array(__DIR__.'/lib'))
 ;
 
 return Symfony\CS\Config\Config::create()

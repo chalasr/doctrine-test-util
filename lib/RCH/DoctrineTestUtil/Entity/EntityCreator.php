@@ -40,10 +40,10 @@ class EntityCreator
      */
     public static function create($name, $path, array $fields, $annotationPrefix = 'ORM\\')
     {
-        self::$name                         = $name;
-        self::$path                         = $path;
-        self::$fields                     = $fields;
         self::$annotationPrefix = $annotationPrefix;
+        self::$name             = $name;
+        self::$path             = $path;
+        self::$fields           = $fields;
 
         $class = new ClassMetadataInfo(self::$name);
         $class->mapField(array('fieldName' => 'id', 'type' => 'integer', 'id' => true));
