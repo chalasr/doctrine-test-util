@@ -11,9 +11,9 @@
 
 namespace RCH\DoctrineTestUtil;
 
-use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\ORM\Tools\Setup;
 
 /**
  * Provides a doctrine testing environment.
@@ -39,9 +39,9 @@ class DatabaseConnection
         $tool->dropSchema($classes);
         $tool->createSchema($classes);
 
-        /** createDefaultDBConnection($pdo, $GLOBALS['db_user']); // Pass it to phpunit */
+        /* createDefaultDBConnection($pdo, $GLOBALS['db_user']); // Pass it to phpunit */
 
-        return new self;
+        return new self();
     }
 
     /**
@@ -55,9 +55,9 @@ class DatabaseConnection
             'mysql://%s:%s@%s/%s', $GLOBALS['db_user'], $GLOBALS['db_password'], $GLOBALS['db_host'], $GLOBALS['db_name']
         ));
 
-        /** @var \Doctrine\ORM\Configuration */
+        /* @var \Doctrine\ORM\Configuration */
         $metadataConfiguration = Setup::createAnnotationMetadataConfiguration(array(__DIR__.'/Entity'), true, null, null, false);
 
-        return EntityManager::create($mysqlConnection, $metadataConfiguration);;
+        return EntityManager::create($mysqlConnection, $metadataConfiguration);
     }
 }

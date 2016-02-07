@@ -12,7 +12,7 @@
 namespace RCH\DoctrineTestUtil\Mock;
 
 /**
- * Mock Builder for Doctrine objects
+ * Mock Builder for Doctrine objects.
  *
  * @link https://gist.github.com/gnutix/7746893
  */

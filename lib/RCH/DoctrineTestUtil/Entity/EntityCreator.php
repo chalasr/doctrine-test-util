@@ -37,8 +37,6 @@ class EntityCreator
      * Creates an entity.
      *
      * @static
-     *
-     * @return void
      */
     public static function create($name, $path, array $fields, $annotationPrefix = 'ORM\\')
     {
