@@ -32,7 +32,6 @@ class DatabaseConnection
     public static function create()
     {
         $entityManager = self::getEntityManager();
-        $pdo = $entityManager->getConnection()->getWrappedConnection();
         $entityManager->clear();
 
         $tool = new SchemaTool($entityManager);

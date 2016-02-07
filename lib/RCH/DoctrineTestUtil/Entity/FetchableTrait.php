@@ -27,7 +27,6 @@ trait FetchableTrait
      */
     public function fetch(array $params)
     {
-        $copy = $params;
         $countWheres = 0;
         $selectStatement = '';
 
@@ -36,7 +35,7 @@ trait FetchableTrait
 
         foreach ($params as $key => $value) {
             $selectStatement .= 't.'.$key;
-            if (next($copy)) {
+            if (next($params)) {
                 $selectStatement .= ', ';
             }
         }
