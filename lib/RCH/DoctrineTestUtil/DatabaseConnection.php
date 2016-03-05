@@ -11,6 +11,7 @@
 
 namespace RCH\DoctrineTestUtil;
 
+use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
@@ -22,6 +23,12 @@ use Doctrine\ORM\Tools\Setup;
  */
 class DatabaseConnection
 {
+    /** @var array */
+    protected static $_config;
+
+    /** @var EntityManager */
+    protected static $_em;
+
     /**
      * Get database connection.
      *
@@ -29,18 +36,53 @@ class DatabaseConnection
      *
      * @return DatabaseConnection
      */
-    public static function create()
+    public static function create($mappingPath)
     {
-        $entityManager = self::getEntityManager();
-        $entityManager->clear();
+        self::$_config = array(
+            'dbname' => $GLOBALS['db_name'],
+            'driver'   => 'pdo_mysql',
+            'host' => $GLOBALS['db_host'],
+            'user' => $GLOBALS['db_user'],
+            'password' => $GLOBALS['db_password'],
+            'charset' => 'UTF8',
+        );
 
-        $tool = new SchemaTool($entityManager);
-        $classes = $entityManager->getMetaDataFactory()->getAllMetaData();
 
+        self::createDatabase(self::$_config);
+
+        /** @var \Doctrine\ORM\Configuration */
+        $metadataConfiguration = Setup::createAnnotationMetadataConfiguration(array($mappingPath), true, null, null, false);
+        self::$_em = EntityManager::create(self::$_config, $metadataConfiguration);
+
+        $pdo = self::$_em->getConnection()->getWrappedConnection();
+        self::$_em->clear();
+
+        $tool = new SchemaTool(self::$_em);
+        $classes = self::$_em->getMetaDataFactory()->getAllMetaData();
         $tool->dropSchema($classes);
         $tool->createSchema($classes);
 
         return new self();
+    }
+
+    public static function createDatabase($path)
+    {
+        $path = array(
+            'driver' => $GLOBALS['db_driver'],
+            'host' => $GLOBALS['db_host'],
+            'user' => $GLOBALS['db_user'],
+            'password' => $GLOBALS['db_password'],
+        );
+
+        $tmpConnection = DriverManager::getConnection($path);
+
+        if (in_array($GLOBALS['db_name'], $tmpConnection->getSchemaManager()->listDatabases())) {
+            return;
+        }
+
+        $tmpConnection->getSchemaManager()->createDatabase($GLOBALS['db_name']);
+
+        $tmpConnection->close();
     }
 
     /**
@@ -52,14 +94,7 @@ class DatabaseConnection
      */
     public static function getEntityManager()
     {
-        $mysqlConnection = array('url' => sprintf(
-            'mysql://%s:%s@%s/%s', $GLOBALS['db_user'], $GLOBALS['db_password'], $GLOBALS['db_host'], $GLOBALS['db_name']
-        ));
-
-        /* @var \Doctrine\ORM\Configuration */
-        $metadataConfiguration = Setup::createAnnotationMetadataConfiguration(array(__DIR__.'/Entity'), true, null, null, false);
-
-        return EntityManager::create($mysqlConnection, $metadataConfiguration);
+        return self::$_em;
     }
 
     /**
@@ -74,7 +109,7 @@ class DatabaseConnection
     public static function getDatabaseConnectionForTest(EntityManager $entityManager = null)
     {
         if (!$entityManager instanceof EntityManager) {
-            $entityManager = self::getEntityManager();
+            $entityManager = self::$_em;
         }
 
         $pdo = $entityManager->getConnection()->getWrappedConnection();
